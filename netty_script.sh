@@ -25,7 +25,7 @@ nohup ssh wso2@192.168.32.6 "./supun/jmeter/bin/jmeter -Jgroup1.host=192.168.32.
 
 # start collecting metrics
 sleep ${warm_up_1}
-curl http://192.168.32.2:8080/reconnect-netty
+curl http://192.168.32.2:9010/reconnect-netty
 sleep ${warm_up_2}
 
 nohup python3 netty_metrics.py ${parent_folder} "test_case_gp_tuning" 0 ${duration} 0 ${measuring_interval} ${metrics_window_size} > netty_metrics.log &
