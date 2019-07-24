@@ -4,7 +4,7 @@ parent_folder="netty/tuning/"
 
 mkdir -p ${parent_folder}
 
-duration="900"
+duration="1500"
 warm_up_1="150"
 warm_up_2="150"
 users="100"
