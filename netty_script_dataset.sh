@@ -6,8 +6,8 @@ parent_folder="netty/dataset/"
 
 mkdir -p ${parent_folder}
 
-duration="600"
-warm_up="60"
+duration="900"
+warm_up="300"
 users="100"
 test="DbWrite" # Should be one of; DbWrite DbRead Prime10m Prime1m Prime10k Prime100k
 metrics_window_size="60"
