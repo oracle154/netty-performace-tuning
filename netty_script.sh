@@ -4,9 +4,9 @@ parent_folder="netty/tuning/"
 
 mkdir -p ${parent_folder}
 
-duration="600"
-warm_up_1="60"
-warm_up_2="60"
+duration="900"
+warm_up_1="150"
+warm_up_2="150"
 users="100"
 test="DbWrite" # Should be one of (exact match) DbWrite DbRead Prime10m Prime1m Prime10k Prime100k
 start_threads="100"
