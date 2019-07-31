@@ -88,16 +88,17 @@ x_data = []
 y_data = []
 
 start_time = time.time()
-use_tpe = False
+use_tpe = True
 
 if use_tpe:
     ii = 0
-    space = hp.uniform('x', 4, 100)
+    space = hp.uniform('x', 4, 200)
     tpe_trials = Trials()
     tpe_best = fmin(fn=objective, space=space, algo=tpe.suggest, trials=tpe_trials,
                     max_evals=test_duration // tuning_interval)
+
 else:
-    thread_pool_max = 100
+    thread_pool_max = 200
     thread_pool_min = 4
 
     # sample more random (or predetermined data points) and collect numbers (up to initial points)
