@@ -10,12 +10,12 @@ import sys
 import csv
 import logging
 
-from bayesian_optimization_util import plot_approximation, plot_acquisition
+#from bayesian_optimization_util import plot_approximation, plot_acquisition
 
 logging.basicConfig(level=logging.INFO)
 
 ####################
-bounds = np.array([[4, 201]])
+bounds = np.array([[1, 201]])
 
 np.random.seed(42)
 
@@ -52,8 +52,7 @@ def get_performance(x_pass, lower_bound, loc, online_check):
         res = requests.get("http://192.168.32.2:8080/performance-netty").json()
 
         data.append(res)
-        print("Mean 99th per : " + str(res[3]))
-        logging.info("Mean 99th per : %s" + str(res[3]))
+        logging.info("99th Percentile :" + str(res[3]))
         return float(res[3])
 
     else:
@@ -64,16 +63,17 @@ def get_performance(x_pass, lower_bound, loc, online_check):
         return return_val
 
 def get_initial_points():
-    for i in range(0, number_of_initial_points):
+    for i in range(0, (number_of_initial_points+1)):
         x = thread_pool_min + i * (thread_pool_max - thread_pool_min) / number_of_initial_points
         x = int(x)
+        logging.info('X = %i', x)
         x_data.append([x])
         y_data.append(get_performance([x], thread_pool_min, i, online))
         param_history.append([x])
 
 
 def data_plot():
-    plot_approximation(model, X_plot_data, Y_plot_data, param_history, y_data, next_x, show_legend=i == 0)
+    #plot_approximation(model, X_plot_data, Y_plot_data, param_history, y_data, next_x, show_legend=i == 0)
     plt.title(f'Iteration {i + 1}')
     plt.show(block=False)
     plt.pause(0.5)
@@ -87,8 +87,8 @@ def gausian_model(kern, xx, yy):
 
     return model
 
-#check_srt = sys.argv[7]
-check_srt = False
+check_srt = sys.argv[7]
+#check_srt = False
 online = True if check_srt == 'True' else False
 
 if online:
@@ -114,7 +114,7 @@ test_duration = ru + mi + rd
 iterations = test_duration // tuning_interval
 
 noise_level = 1e-6
-number_of_initial_points = 4
+number_of_initial_points = 8
 
 
 x_data = []
@@ -123,7 +123,7 @@ y_data = []
 start_time = time.time()
 
 thread_pool_max = 200
-thread_pool_min = 4
+thread_pool_min = 1
 
 if not online:
     noise_dist = np.random.normal(0, 5, 20)
@@ -135,17 +135,16 @@ model = gausian_model(kernel, x_data, y_data)
 
 xi = 0.1
 
+
 # use bayesian optimization
-for i in range(number_of_initial_points, iterations):
+for i in range((number_of_initial_points+1), iterations):
     minimum = min(y_data)
     x_location = y_data.index(min(y_data))
     max_expected_improvement = 0
     max_points = []
     max_points_unnormalized = []
 
-    print("xi - ", xi)
     logging.info("xi - %f", xi)
-    print("iter - ", i)
     logging.info("iter - %i", i)
 
     for pool_size in range(thread_pool_min, thread_pool_max + 1):
@@ -164,10 +163,8 @@ for i in range(number_of_initial_points, iterations):
             max_points.append(x_val)
 
     if max_expected_improvement == 0:
-        print("WARN: Maximum expected improvement was 0. Most likely to pick a random point next")
         logging.info("WARN: Maximum expected improvement was 0. Most likely to pick a random point next")
         next_x = x_data[x_location]
-        print(next_x)
         logging.info(next_x)
         xi = xi - xi / 10
         if xi < 0.00001:
@@ -183,6 +180,8 @@ for i in range(number_of_initial_points, iterations):
         elif xi == 0:
             xi = 0.00002
 
+    logging.info(next_x)
+
     param_history.append(next_x)
     next_y = get_performance(next_x, thread_pool_min, i, online)
     y_data.append(next_y)
@@ -196,7 +195,6 @@ for i in range(number_of_initial_points, iterations):
     if not online:
         data_plot()
 
-print("minimum found : ", min(y_data))
 logging.info("minimum found : %f", min(y_data))
 
 if online:
