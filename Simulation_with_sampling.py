@@ -264,13 +264,12 @@ for i in range((number_of_initial_points + 1), iterations):
                 variance_matrix.append(y_data[var_i])
                 var_x.append(x_data[var_i])
 
-
             variance = np.var(variance_matrix)
             print("variance", variance)
 
-            if variance > 100:
-                var_remove = loc_num + max_num
-                while var_remove > (loc_num+1):
+            if variance > 50:
+                var_remove = loc_num + max_num -1
+                while var_remove > (loc_num):
                     param_history.remove(param_history[var_remove])
                     x_data.remove(x_data[var_remove])
                     y_data.remove(y_data[var_remove])
